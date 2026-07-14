@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+client/node_modules/
+
+# build output
+client/dist/
+dist/
+
+# database (better-sqlite3 + WAL sidecars)
+server/db/*.db
+server/db/*.db-wal
+server/db/*.db-shm
+
+# runtime sandbox scratch (bind-mounted into runner)
+server/tmp/*
+!server/tmp/.gitkeep
+
+# env
+.env
+
+# logs & os cruft
+*.log
+.DS_Store

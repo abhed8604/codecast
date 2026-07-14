@@ -1,0 +1,11 @@
+services:
+  runner:
+    build: ./runner
+    container_name: codecast-runner
+    # Bind-mount host scratch dir into the sandbox. `:Z` is a no-op on
+    # non-SELinux Docker Desktop and keeps rootless podman happy on SELinux hosts.
+    volumes:
+      - ./server/tmp:/sandbox:Z
+    # No ports are ever published: the backend talks to this container
+    # exclusively via `docker exec`, never over the network.
+    init: true

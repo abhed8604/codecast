@@ -1,0 +1,47 @@
+{
+  "name": "codecast",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive coding tutorial platform - watch code type itself, solve checkpoints.",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n runner,server,client -c blue,green,magenta \"npm run runner\" \"npm run server\" \"npm run client\"",
+    "runner": "docker compose up --build",
+    "server": "node server/index.js",
+    "client": "vite client/",
+    "build": "vite build client/",
+    "start": "cross-env NODE_ENV=production node server/index.js",
+    "lint": "eslint . --ext .js,.jsx",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
+    "better-sqlite3": "^11.3.0",
+    "compression": "^1.7.4",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.0",
+    "framer-motion": "^11.5.4",
+    "monaco-editor": "^0.52.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
+    "uuid": "^10.0.0",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.0.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "postcss": "^8.4.47",
+    "prettier": "^3.3.3",
+    "tailwindcss": "^3.4.13",
+    "vite": "^5.4.8"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

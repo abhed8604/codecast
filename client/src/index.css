@@ -1,0 +1,253 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+  :root {
+    /* ---- Color tokens (single source of truth) ---- */
+    --bg-void: #06040b;
+    --bg-surface: #0e0a14;
+    --bg-surface-2: #15101c;
+    --bg-surface-blur: rgba(5, 3, 8, 0.86);
+    --violet-primary: #8b5cf6;
+    --violet-deep: #4c1d95;
+    --violet-glow: #c4b5fd;
+    --text-primary: #f1edf7;
+    --text-muted: #948aa3;
+    --danger: #ef4444;
+    --success: #22c55e;
+  }
+
+@layer base {
+  * {
+    border-color: rgba(139, 92, 246, 0.12);
+  }
+
+  html {
+    background-color: var(--bg-void);
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--bg-void);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: rgba(76, 29, 149, 0.5);
+    color: var(--text-primary);
+  }
+
+  /* Visible, keyboard-first focus states everywhere. */
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--bg-void), 0 0 0 4px var(--violet-glow);
+    border-radius: 8px;
+  }
+
+  /* Slim, on-brand scrollbars (kept only for the page/grid scroll). */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.25);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.45);
+    background-clip: padding-box;
+  }
+
+  /* Hide scrollbars inside panels (editor/output/modal/diff) while keeping
+     wheel/trackpad scrolling. The lesson grid scrolls via the page instead. */
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  /* ---- The signature pop-out modal ----
+     Less blur, more darken so the rest of the screen reads as a
+     dim backdrop rather than a frosted wash. */
+  .modal-backdrop {
+    background: rgba(5, 3, 8, 0.86);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .modal-panel {
+    background: var(--bg-surface);
+    border-radius: 32px;
+    box-shadow:
+      0 0 0 1px rgba(139, 92, 246, 0.15),
+      0 20px 60px rgba(0, 0, 0, 0.5),
+      0 0 40px rgba(139, 92, 246, 0.08);
+  }
+
+  /* ---- Bottom sheet (ChallengePanel) ---- */
+  .sheet-panel {
+    background: var(--bg-surface);
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    border-top: 1px solid rgba(196, 181, 253, 0.35);
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  /* ---- Frosted panel language (toasts, popovers) ---- */
+  .frost {
+    background: var(--bg-surface-blur);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(196, 181, 253, 0.14);
+  }
+
+  /* ---- DiffView tints (layered over Monaco's own diff highlighting) ---- */
+  .diff-original {
+    background: rgba(34, 197, 94, 0.1) !important;
+    border-left: 2px solid rgba(34, 197, 94, 0.4) !important;
+  }
+  .diff-modified {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-left: 2px solid rgba(239, 68, 68, 0.4) !important;
+  }
+
+  /* Retune Monaco's own diff decorations to sit on the dark violet base.
+     Left pane (original) = instructor's correct code = green.
+     Right pane (modified) = student's code = red. */
+  .monaco-diff-editor .line-insert,
+  .monaco-diff-editor .char-insert {
+    background: rgba(34, 197, 94, 0.16) !important;
+  }
+  .monaco-diff-editor .line-delete,
+  .monaco-diff-editor .char-delete {
+    background: rgba(239, 68, 68, 0.16) !important;
+  }
+  .monaco-diff-editor .margin-view-overlays .line-insert {
+    background: rgba(34, 197, 94, 0.28) !important;
+  }
+  .monaco-diff-editor .margin-view-overlays .line-delete {
+    background: rgba(239, 68, 68, 0.28) !important;
+  }
+  .monaco-diff-editor .diagonal-fill {
+    opacity: 0.35;
+  }
+
+  /* ---- Primary button ---- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+    padding: 0.625rem 1.1rem;
+    transition:
+      transform 0.12s cubic-bezier(0.16, 1, 0.3, 1),
+      background 0.2s ease,
+      box-shadow 0.2s ease,
+      border-color 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+  }
+  .btn:active {
+    transform: translateY(1px) scale(0.985);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--violet-primary);
+    color: #120b1c;
+    font-weight: 600;
+  }
+  .btn-primary:not(:disabled):hover {
+    background: #9d70f7;
+    box-shadow: 0 0 24px rgba(139, 92, 246, 0.28);
+  }
+  .btn-ghost {
+    background: rgba(139, 92, 246, 0.08);
+    color: var(--text-primary);
+    border: 1px solid rgba(139, 92, 246, 0.18);
+  }
+  .btn-ghost:not(:disabled):hover {
+    background: rgba(139, 92, 246, 0.16);
+    border-color: rgba(139, 92, 246, 0.4);
+  }
+  .btn-danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.28);
+  }
+  .btn-danger:not(:disabled):hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+  }
+
+  /* ---- Form fields ---- */
+  .field-label {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+    text-transform: none;
+  }
+  .field-input {
+    width: 100%;
+    background: var(--bg-void);
+    border: 1px solid rgba(139, 92, 246, 0.18);
+    border-radius: 10px;
+    padding: 0.65rem 0.85rem;
+    color: var(--text-primary);
+    font-size: 15px;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .field-input::placeholder {
+    color: #5a5068;
+  }
+  .field-input:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.6);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  }
+
+  .mono {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+  }
+}
+
+/* Respect reduced motion for perpetual animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
