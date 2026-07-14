@@ -15,15 +15,10 @@ import {
   ArrowLeftIcon,
 } from '../components/Icons.jsx'
 import { useTutorialStore } from '../store/useTutorialStore.js'
+import { grid, item } from '../lib/motion.js'
 
 // Lazy so Monaco stays out of the Studio bundle until recording starts.
 const Record = lazy(() => import('../pages/Record.jsx'))
-
-const grid = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }
-const item = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 220, damping: 24 } },
-}
 
 export default function StudioList() {
   const navigate = useNavigate()

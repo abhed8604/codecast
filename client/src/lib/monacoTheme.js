@@ -1,5 +1,7 @@
 let defined = false
 
+export const THEME_NAME = 'codecast-violet'
+
 /**
  * Define and register the single Monaco theme used across the whole app
  * (live recording, read-only replay, checkpoint editing, diff view).
@@ -35,5 +37,3 @@ export function defineCodecastTheme(monacoInstance) {
   defined = true
   return THEME_NAME
 }
-
-export const THEME_NAME = 'codecast-violet'

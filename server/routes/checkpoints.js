@@ -5,16 +5,22 @@ import { httpError } from '../middleware/errorHandler.js'
 
 const router = Router()
 
+/** Validate a string field; throws 400. By default empty strings fail too. */
+function requireString(value, name, { allowEmpty = false } = {}) {
+  if (typeof value !== 'string') throw httpError(400, `${name} must be a string`)
+  if (!allowEmpty && !value.trim()) throw httpError(400, `${name} cannot be empty`)
+  return value.trim()
+}
 /** POST /api/checkpoints — create a checkpoint on a tutorial. */
 router.post('/', (req, res) => {
-  const { tutorial_id, timestamp_ms, title, objective, correct_output_delta } = req.body || {}
+  const { tutorial_id, timestamp_ms, correct_output_delta } = req.body || {}
 
   if (!tutorial_id) throw httpError(400, 'tutorial_id is required')
   if (typeof timestamp_ms !== 'number') throw httpError(400, 'timestamp_ms must be a number')
-  if (!title || !title.trim()) throw httpError(400, 'Title is required')
-  if (!objective || !objective.trim()) throw httpError(400, 'Objective is required')
-  if (correct_output_delta === undefined || correct_output_delta === null) {
-    throw httpError(400, 'correct_output_delta is required')
+  const title = requireString(req.body.title, 'Title')
+  const objective = requireString(req.body.objective, 'Objective')
+  if (typeof correct_output_delta !== 'string') {
+    throw httpError(400, 'correct_output_delta must be a string')
   }
 
   const exists = db.prepare('SELECT id FROM tutorials WHERE id = ?').get(tutorial_id)
@@ -24,7 +30,7 @@ router.post('/', (req, res) => {
   db.prepare(
     `INSERT INTO checkpoints (id, tutorial_id, timestamp_ms, title, objective, correct_output_delta)
      VALUES (?, ?, ?, ?, ?, ?)`
-  ).run(id, tutorial_id, Math.round(timestamp_ms), title.trim(), objective.trim(), correct_output_delta)
+  ).run(id, tutorial_id, Math.round(timestamp_ms), title, objective, correct_output_delta)
 
   const checkpoint = db.prepare('SELECT * FROM checkpoints WHERE id = ?').get(id)
   res.status(201).json(checkpoint)
@@ -35,7 +41,7 @@ router.patch('/:id', (req, res) => {
   const checkpoint = db.prepare('SELECT id FROM checkpoints WHERE id = ?').get(req.params.id)
   if (!checkpoint) throw httpError(404, 'Checkpoint not found')
 
-  const { timestamp_ms, title, objective, correct_output_delta } = req.body || {}
+  const { timestamp_ms, correct_output_delta } = req.body || {}
   const sets = []
   const values = []
 
@@ -44,17 +50,18 @@ router.patch('/:id', (req, res) => {
     sets.push('timestamp_ms = ?')
     values.push(Math.round(timestamp_ms))
   }
-  if (title !== undefined) {
-    if (!title.trim()) throw httpError(400, 'Title cannot be empty')
+  if (req.body.title !== undefined) {
     sets.push('title = ?')
-    values.push(title.trim())
+    values.push(requireString(req.body.title, 'Title'))
   }
-  if (objective !== undefined) {
-    if (!objective.trim()) throw httpError(400, 'Objective cannot be empty')
+  if (req.body.objective !== undefined) {
     sets.push('objective = ?')
-    values.push(objective.trim())
+    values.push(requireString(req.body.objective, 'Objective'))
   }
   if (correct_output_delta !== undefined) {
+    if (typeof correct_output_delta !== 'string') {
+      throw httpError(400, 'correct_output_delta must be a string')
+    }
     sets.push('correct_output_delta = ?')
     values.push(correct_output_delta)
   }

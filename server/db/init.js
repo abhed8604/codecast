@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const DB_PATH = process.env.DB_PATH
-  ? resolve(process.cwd(), process.env.DB_PATH)
+  ? resolve(__dirname, process.env.DB_PATH)
   : resolve(__dirname, 'codecast.db')
 
 const db = new Database(DB_PATH)

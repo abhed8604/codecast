@@ -5,6 +5,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { dockerExecWithRetry } from '../lib/dockerExec.js'
 import { httpError } from '../middleware/errorHandler.js'
+import { SUPPORTED_LANGUAGES } from '../lib/languages.js'
 
 const router = Router()
 
@@ -12,7 +13,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 // server/tmp is bind-mounted to /sandbox inside the runner container.
 const TMP_DIR = resolve(__dirname, '../tmp')
 
-const MAX_OUTPUT_BYTES = 50 * 1024 // 50KB cap on returned stdout
+const MAX_OUTPUT_BYTES = Number(process.env.MAX_OUTPUT_BYTES) || 50 * 1024
 
 function truncate(str) {
   if (str.length <= MAX_OUTPUT_BYTES) return str
@@ -37,7 +38,7 @@ const asyncHandler = (fn) => (req, res, next) => Promise.resolve(fn(req, res, ne
 router.post('/', asyncHandler(async (req, res) => {
   const { code, language } = req.body || {}
   if (typeof code !== 'string') throw httpError(400, 'code is required')
-  if (!['python', 'cpp', 'sql'].includes(language)) throw httpError(400, 'Invalid language')
+  if (!SUPPORTED_LANGUAGES.includes(language)) throw httpError(400, 'Invalid language')
 
   const stamp = uuid()
   const created = []
@@ -47,16 +48,16 @@ router.post('/', asyncHandler(async (req, res) => {
       const file = `${stamp}.py`
       await writeFile(resolve(TMP_DIR, file), code)
       created.push(file)
-      const run = await dockerExecWithRetry(`python3 /sandbox/${file}`)
-      return res.json(formatResult(run))
+      const result = await dockerExecWithRetry(`python3 /sandbox/${file}`)
+      return res.json(formatResult(result))
     }
 
     if (language === 'sql') {
       const file = `${stamp}.sql`
       await writeFile(resolve(TMP_DIR, file), code)
       created.push(file)
-      const run = await dockerExecWithRetry(`sqlite3 :memory: < /sandbox/${file}`)
-      return res.json(formatResult(run))
+      const result = await dockerExecWithRetry(`sqlite3 :memory: < /sandbox/${file}`)
+      return res.json(formatResult(result))
     }
 
     if (language === 'cpp') {
@@ -78,18 +79,18 @@ router.post('/', asyncHandler(async (req, res) => {
         })
       }
       created.push(bin)
-      const run = await dockerExecWithRetry(`/sandbox/${bin}`)
-      return res.json(formatResult(run))
+      const result = await dockerExecWithRetry(`/sandbox/${bin}`)
+      return res.json(formatResult(result))
     }
   } finally {
     await Promise.all(created.map((f) => safeUnlink(resolve(TMP_DIR, f))))
   }
 }))
 
-function formatResult(run) {
-  const output = truncate(run.stdout || '')
-  const stderr = truncate(run.stderr || '')
-  if (run.failed) {
+function formatResult(result) {
+  const output = truncate(result.stdout || '')
+  const stderr = truncate(result.stderr || '')
+  if (result.failed) {
     // `timeout -s KILL` and OOM kills surface as a bare "Killed" (exit 137).
     const isLimit = !stderr || /^killed$/i.test(stderr)
     return {

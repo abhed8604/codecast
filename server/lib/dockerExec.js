@@ -1,8 +1,8 @@
 import { execFile } from 'node:child_process'
 
 const CONTAINER = process.env.RUNNER_CONTAINER || 'codecast-runner'
-const TIME_LIMIT_S = 5
-const MEM_LIMIT_KB = 131072 // 128MB
+const TIME_LIMIT_S = Number(process.env.RUNNER_TIME_LIMIT_S) || 5
+const MEM_LIMIT_KB = Number(process.env.RUNNER_MEM_LIMIT_KB) || 131072 // 128MB
 
 /**
  * Run a shell command inside the runner container via `docker exec`.
@@ -56,7 +56,7 @@ function cleanStderr(stderr) {
 export async function dockerExecWithRetry(innerCmd, opts = {}) {
   const attempts = 3
   const delayMs = 1500
-  let last = { stdout: '', stderr: 'runner unavailable', failed: true }
+  let lastResult = { stdout: '', stderr: 'runner unavailable', failed: true }
 
   for (let i = 0; i < attempts; i++) {
     const res = await dockerExec(innerCmd, opts)
@@ -65,8 +65,8 @@ export async function dockerExecWithRetry(innerCmd, opts = {}) {
     const containerDown =
       res.failed && !res.stdout && /no such container|is not running|Cannot connect/i.test(res.stderr)
     if (!containerDown) return res
-    last = res
+    lastResult = res
     if (i < attempts - 1) await new Promise((r) => setTimeout(r, delayMs))
   }
-  return last
+  return lastResult
 }

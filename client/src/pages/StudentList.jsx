@@ -7,24 +7,8 @@ import EmptyState from '../components/EmptyState.jsx'
 import { ListSkeleton } from '../components/Skeleton.jsx'
 import { LanguageBadge, formatDuration } from '../components/Badges.jsx'
 import { BookIcon, PlayIcon, ArrowLeftIcon, CheckIcon } from '../components/Icons.jsx'
-import { useTutorialStore } from '../store/useTutorialStore.js'
-
-const grid = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.06 } },
-}
-const item = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 220, damping: 24 } },
-}
-
-function progressFor(tutorialId) {
-  try {
-    return JSON.parse(localStorage.getItem(`codecast:progress:${tutorialId}`) || '{}')
-  } catch {
-    return {}
-  }
-}
+import { useTutorialStore, getProgress } from '../store/useTutorialStore.js'
+import { grid, item } from '../lib/motion.js'
 
 export default function StudentList() {
   const navigate = useNavigate()
@@ -95,7 +79,7 @@ export default function StudentList() {
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
         >
           {tutorials.map((t) => {
-            const progress = progressFor(t.id)
+            const progress = getProgress(t.id)
             const solved = Object.values(progress).filter((s) => s === 'passed').length
             return (
               <motion.div key={t.id} variants={item}>

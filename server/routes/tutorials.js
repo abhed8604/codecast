@@ -2,12 +2,9 @@ import { Router } from 'express'
 import { v4 as uuid } from 'uuid'
 import db from '../db/init.js'
 import { httpError } from '../middleware/errorHandler.js'
+import { SUPPORTED_LANGUAGES } from '../lib/languages.js'
 
 const router = Router()
-
-const LANGUAGES = new Set(['python', 'cpp', 'sql'])
-
-/** GET /api/tutorials?status=published — list (studio omits the filter). */
 router.get('/', (req, res) => {
   const { status } = req.query
   let rows
@@ -41,9 +38,18 @@ router.get('/:id', (req, res) => {
     .prepare('SELECT * FROM checkpoints WHERE tutorial_id = ? ORDER BY timestamp_ms ASC')
     .all(tutorial.id)
 
+  let eventLog = []
+  if (tutorial.event_log) {
+    try {
+      eventLog = JSON.parse(tutorial.event_log)
+    } catch {
+      throw httpError(500, 'Recording data is corrupted')
+    }
+  }
+
   res.json({
     ...tutorial,
-    event_log: tutorial.event_log ? JSON.parse(tutorial.event_log) : [],
+    event_log: eventLog,
     checkpoints,
   })
 })
@@ -52,7 +58,7 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   const { title, description = '', language } = req.body || {}
   if (!title || !title.trim()) throw httpError(400, 'Title is required')
-  if (!LANGUAGES.has(language)) throw httpError(400, 'Invalid or missing language')
+  if (!SUPPORTED_LANGUAGES.includes(language)) throw httpError(400, 'Invalid or missing language')
 
   const id = uuid()
   db.prepare(

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { PlayIcon, PauseIcon, FlagIcon } from './Icons.jsx'
 import { formatDuration } from './Badges.jsx'
 import { CheckpointStatus } from '../lib/types.js'
+import { SCRUB_THROTTLE_MS } from '../lib/constants.js'
 
 const markerColor = {
   [CheckpointStatus.PASSED]: 'bg-success ring-success/40',
@@ -51,7 +52,7 @@ export default function Timeline({
     (ms, { throttle = false } = {}) => {
       if (throttle) {
         const now = performance.now()
-        if (now - lastEmitRef.current < 50) return
+        if (now - lastEmitRef.current < SCRUB_THROTTLE_MS) return
         lastEmitRef.current = now
       }
       onSeek?.(ms)

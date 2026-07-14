@@ -40,8 +40,8 @@ export function getBaselineOutputAt(eventLog, timestampMs) {
  * @returns {string}
  */
 export function suggestDelta(eventLog, checkpointMs, endMs) {
-  const atCp = getBaselineOutputAt(eventLog, checkpointMs)
-  const atEnd = getBaselineOutputAt(eventLog, endMs)
+  const atCp = normalize(getBaselineOutputAt(eventLog, checkpointMs))
+  const atEnd = normalize(getBaselineOutputAt(eventLog, endMs))
   return atEnd.startsWith(atCp) ? atEnd.slice(atCp.length) : atEnd
 }
 

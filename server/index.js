@@ -11,7 +11,7 @@ import executeRouter from './routes/execute.js'
 import { errorHandler } from './middleware/errorHandler.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3002
 
 const app = express()
 

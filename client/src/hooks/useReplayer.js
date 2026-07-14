@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { seekForward, rebuildTo } from '../lib/replayer.js'
+import { CLOCK_THROTTLE_MS } from '../lib/constants.js'
 
 /**
  * Thin React wrapper around lib/replayer.js. Drives the replay clock with
@@ -51,7 +52,7 @@ export function useReplayer({ eventLog, durationMs }) {
 
   const pushClock = useCallback((ms, force = false) => {
     const now = performance.now()
-    if (force || now - lastWriteRef.current > 60) {
+      if (force || now - lastWriteRef.current > CLOCK_THROTTLE_MS) {
       lastWriteRef.current = now
       setClockMs(ms)
     }

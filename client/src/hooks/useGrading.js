@@ -8,8 +8,6 @@ import { getBaselineOutputAt, gradeRun, suggestDelta } from '../lib/grading.js'
  * @param {import('../lib/types.js').ReplayEvent[]} eventLog
  */
 export function useGrading(eventLog = []) {
-  const baselineAt = useCallback((ms) => getBaselineOutputAt(eventLog, ms), [eventLog])
-
   const grade = useCallback(
     (fullRunOutput, checkpointTimestampMs, correctOutputDelta) => {
       const baseline = getBaselineOutputAt(eventLog, checkpointTimestampMs)
@@ -23,5 +21,5 @@ export function useGrading(eventLog = []) {
     [eventLog]
   )
 
-  return { baselineAt, grade, suggest }
+  return { grade, suggest }
 }

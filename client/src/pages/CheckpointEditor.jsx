@@ -11,6 +11,7 @@ import EmptyState from '../components/EmptyState.jsx'
 import { useReplayer } from '../hooks/useReplayer.js'
 import { useGrading } from '../hooks/useGrading.js'
 import { latestExecutionUpTo } from '../lib/replayer.js'
+import { nextCheckpointAfter } from '../lib/checkpoints.js'
 import { api } from '../api/client.js'
 import { useTutorialStore } from '../store/useTutorialStore.js'
 import {
@@ -67,6 +68,8 @@ export default function CheckpointEditor() {
     [replayer]
   )
 
+  const onSeek = useCallback((ms) => replayer.seek(ms), [replayer])
+
   const baselineOutput = useMemo(
     () => latestExecutionUpTo(eventLog, replayer.clockMs),
     [eventLog, replayer.clockMs]
@@ -75,10 +78,7 @@ export default function CheckpointEditor() {
   // End of the segment the student will write: the next checkpoint's timestamp,
   // or the recording's full duration if this is the last checkpoint.
   const segmentEndMs = useCallback(
-    (fromMs) => {
-      const after = checkpoints.filter((c) => c.timestamp_ms > fromMs)
-      return after.length ? Math.min(...after.map((c) => c.timestamp_ms)) : durationMs
-    },
+    (fromMs) => nextCheckpointAfter(checkpoints, fromMs, durationMs),
     [checkpoints, durationMs]
   )
 
@@ -224,7 +224,7 @@ export default function CheckpointEditor() {
               onPlayPause={() =>
                 replayer.isPlaying ? replayer.pause() : replayer.play()
               }
-              onSeek={(ms) => replayer.seek(ms)}
+              onSeek={onSeek}
               onMarkerClick={(cp) => replayer.seek(cp.timestamp_ms)}
               checkpoints={checkpoints}
             />

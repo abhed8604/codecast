@@ -1,11 +1,9 @@
 import { create } from 'zustand'
-import { CheckpointStatus } from '../lib/types.js'
 
 /**
- * Global store. Deliberately small: toasts (app-wide feedback), the loaded
- * tutorial, a lightweight replay clock slice, and checkpoint progress mirrored
- * from localStorage. Components should select single fields, never destructure
- * the whole store, so the replay clock ticking doesn't re-render everything.
+ * Global store. Deliberately small: toasts (app-wide feedback) and a
+ * checkpoint-progress slice mirroed from localStorage. Components should select
+ * single fields, never destructure the whole store.
  */
 
 const progressKey = (tutorialId) => `codecast:progress:${tutorialId}`
@@ -16,6 +14,12 @@ function readProgress(tutorialId) {
   } catch {
     return {}
   }
+}
+
+/** Read a tutorial's saved checkpoint progress directly (for list views that
+ *  show many tutorials at once; the store's `progress` holds only one). */
+export function getProgress(tutorialId) {
+  return readProgress(tutorialId)
 }
 
 let toastSeq = 0
@@ -30,18 +34,6 @@ export const useTutorialStore = create((set, get) => ({
     return id
   },
   dismissToast: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
-
-  // ---- Current tutorial ---------------------------------------------------
-  currentTutorial: null,
-  setCurrentTutorial: (t) => set({ currentTutorial: t }),
-
-  // ---- Replay clock (throttled writes from the rAF loop) ------------------
-  clockMs: 0,
-  durationMs: 0,
-  isPlaying: false,
-  setClock: (ms) => set({ clockMs: ms }),
-  setDuration: (ms) => set({ durationMs: ms }),
-  setPlaying: (v) => set({ isPlaying: v }),
 
   // ---- Checkpoint progress (mirrors localStorage) -------------------------
   progress: {},
@@ -64,5 +56,3 @@ export const useTutorialStore = create((set, get) => ({
     set({ progress: {} })
   },
 }))
-
-export { CheckpointStatus }

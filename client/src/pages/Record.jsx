@@ -45,8 +45,9 @@ export default function Record({ embedded = false, open = true, onClose }) {
     }
     setFormError('')
     setPhase('recording')
-    // Defer start slightly so the editor is mounted & empty first.
-    requestAnimationFrame(() => start(''))
+    // Editor mounts empty; start() captures the empty initial keyframe
+    // synchronously so the first keystroke is never dropped.
+    start('')
   }
 
   const runCode = useCallback(async () => {

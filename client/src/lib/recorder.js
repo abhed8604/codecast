@@ -7,10 +7,12 @@
  * keyframe so backward scrubbing can resync cheaply instead of replaying from 0.
  */
 
+import { KEYFRAME_INTERVAL } from './constants.js'
+
 /**
  * @param {{ keyframeInterval?: number }} [opts]
  */
-export function createRecorder({ keyframeInterval = 40 } = {}) {
+export function createRecorder({ keyframeInterval = KEYFRAME_INTERVAL } = {}) {
   /** @type {number|null} */
   let startTime = null
   /** @type {import('./types.js').ReplayEvent[]} */
@@ -25,10 +27,6 @@ export function createRecorder({ keyframeInterval = 40 } = {}) {
       startTime = performance.now()
       events = [{ t: 0, type: 'edit', fullValue: initialValue }]
       editCount = 0
-    },
-
-    isRecording() {
-      return startTime != null
     },
 
     /**

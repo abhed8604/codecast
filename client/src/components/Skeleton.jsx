@@ -48,5 +48,3 @@ export function EditorSkeleton({ label = 'Loading editor' }) {
     </div>
   )
 }
-
-export default Shimmer

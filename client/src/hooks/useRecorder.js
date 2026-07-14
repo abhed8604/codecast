@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createRecorder } from '../lib/recorder.js'
+import { RECORDER_POLL_MS } from '../lib/constants.js'
 
 /**
  * Thin React wrapper around lib/recorder.js. Owns a single recorder instance and
@@ -19,7 +20,7 @@ export function useRecorder() {
     setElapsed(0)
     timerRef.current = setInterval(() => {
       setElapsed(recorderRef.current.getElapsed())
-    }, 100)
+    }, RECORDER_POLL_MS)
   }, [])
 
   const recordEdit = useCallback((changes, fullValue) => {

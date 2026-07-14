@@ -62,11 +62,23 @@ export function rebuildTo(model, eventLog, targetTimeMs) {
 }
 
 /**
- * The most recent execution output at or before targetTimeMs, and whether the
- * caller has crossed a new execution event since `fromIndex`. Kept here so the
+ * Rebuild the instructor's code at `targetTimeMs` using a throwaway model,
+ * returning the resulting text. The model is always disposed.
+ */
+export function reconstructAt(monaco, eventLog, langId, targetTimeMs) {
+  const model = monaco.editor.createModel('', langId)
+  try {
+    rebuildTo(model, eventLog, targetTimeMs)
+    return model.getValue()
+  } finally {
+    model.dispose()
+  }
+}
+/**
+ * The most recent execution output at or before targetTimeMs. Kept here so the
  * output panel stays in sync with the same event stream driving the editor.
  *
- * @returns {{ output: string, error: string, index: number }|null}
+ * @returns {{ output: string, error: string }|null}
  */
 export function latestExecutionUpTo(eventLog, targetTimeMs) {
   let found = null
@@ -75,5 +87,5 @@ export function latestExecutionUpTo(eventLog, targetTimeMs) {
     if (ev.t > targetTimeMs) break
     if (ev.type === 'execution') found = ev
   }
-  return found ? { output: found.output ?? '', error: found.error ?? '', index: 0 } : null
+  return found ? { output: found.output ?? '', error: found.error ?? '' } : null
 }

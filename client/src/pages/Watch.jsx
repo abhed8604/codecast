@@ -16,8 +16,9 @@ import { ArrowLeftIcon, FlagIcon, CheckIcon } from '../components/Icons.jsx'
 
 import { useReplayer } from '../hooks/useReplayer.js'
 import { useGrading } from '../hooks/useGrading.js'
-import { rebuildTo, latestExecutionUpTo } from '../lib/replayer.js'
+import { latestExecutionUpTo, reconstructAt } from '../lib/replayer.js'
 import { firstEventAfter } from '../lib/seek.js'
+import { nextCheckpointAfter, cpAt } from '../lib/checkpoints.js'
 import { LANGUAGES, CheckpointStatus } from '../lib/types.js'
 import { api } from '../api/client.js'
 import { useTutorialStore } from '../store/useTutorialStore.js'
@@ -89,61 +90,23 @@ export default function Watch({ mode = 'student' }) {
     [checkpoints, progress]
   )
 
-  // ---- imperative helpers ------------------------------------------------
-  // Stop at EVERY checkpoint regardless of saved status, so a replay always
-  // pauses where the student should take over.
-  const cpAt = useCallback(
-    (ms) => checkpoints.find((c) => Math.abs(c.timestamp_ms - ms) < 2),
-    [checkpoints]
-  )
-
-  const nextBoundary = useCallback(
-    (fromMs) => {
-      const after = checkpoints.filter((c) => c.timestamp_ms > fromMs + 1)
-      return after.length ? Math.min(...after.map((c) => c.timestamp_ms)) : durationMs
-    },
-    [checkpoints, durationMs]
-  )
-
-  const nextCheckpointMs = useCallback(
-    (cp) => {
-      const after = checkpoints.filter((c) => c.timestamp_ms > cp.timestamp_ms)
-      return after.length ? Math.min(...after.map((c) => c.timestamp_ms)) : durationMs
-    },
-    [checkpoints, durationMs]
-  )
-
-  /** Reconstruct instructor code at an arbitrary time using a throwaway model. */
-  const reconstructAt = useCallback(
-    (ms) => {
-      const monaco = monacoRef.current
-      if (!monaco) return ''
-      const model = monaco.editor.createModel('', langId)
-      try {
-        rebuildTo(model, eventLog, ms)
-        return model.getValue()
-      } finally {
-        model.dispose()
-      }
-    },
-    [eventLog, langId]
-  )
-
   // ---- transport ----------------------------------------------------------
   const startPlay = useCallback(() => {
     const clock = replayer.clockRef.current
-    const here = cpAt(clock)
+    const here = cpAt(checkpoints, clock)
     if (here) {
       enterChallenge(here)
       return
     }
-    const boundary = nextBoundary(clock)
+    const boundary = nextCheckpointAfter(checkpoints, clock, durationMs, 1)
     replayer.play(boundary, (reached) => {
-      const cp = cpAt(reached)
+      const cp = cpAt(checkpoints, reached)
       if (cp) enterChallenge(cp)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cpAt, nextBoundary, replayer])
+  }, [checkpoints, durationMs, replayer, enterChallenge])
+
+  const onSeek = useCallback((ms) => replayer.seek(ms), [replayer])
 
   const onReplayReady = useCallback(
     (editor, monaco) => {
@@ -164,7 +127,7 @@ export default function Watch({ mode = 'student' }) {
 
   // ---- challenge ----------------------------------------------------------
   function enterChallenge(cp) {
-    const instructorSoFar = replayEditorRef.current?.getValue() ?? reconstructAt(cp.timestamp_ms)
+    const instructorSoFar = replayEditorRef.current?.getValue() ?? reconstructAt(monacoRef.current, eventLog, langId, cp.timestamp_ms)
     replayer.pause()
     replayer.detach()
     setActiveCp(cp)
@@ -197,8 +160,8 @@ export default function Watch({ mode = 'student' }) {
     const cp = activeCp
     setCheckpointStatus(id, cp.id, status)
 
-    const segEnd = nextCheckpointMs(cp)
-    const original = reconstructAt(segEnd)
+    const segEnd = nextCheckpointAfter(checkpoints, cp.timestamp_ms, durationMs)
+    const original = reconstructAt(monacoRef.current, eventLog, langId, segEnd)
     const cpIndex = checkpoints.findIndex((c) => c.id === cp.id) + 1
     setDiffData({ original, modified: studentCode, cpIndex, cpTitle: cp.title })
 
@@ -208,7 +171,7 @@ export default function Watch({ mode = 'student' }) {
     const nextExec = firstEventAfter(eventLog, startMs, (e) => e.type === 'execution')
     const diffUntil = nextExec ? nextExec.t : segEnd
 
-    resumeRef.current = nextCheckpointMs(cp) // where playback continues after closing
+    resumeRef.current = nextCheckpointAfter(checkpoints, cp.timestamp_ms, durationMs) // where playback continues after closing
     // Defer the play to the ReplayEditor remount (view -> 'replay').
     pendingActionRef.current = {
       seekMs: startMs,
@@ -227,7 +190,7 @@ export default function Watch({ mode = 'student' }) {
     // Resume and stop at the next checkpoint (handled by startPlay's boundary).
     const target = resumeRef.current
     replayer.play(target, (reached) => {
-      const cp = cpAt(reached)
+      const cp = cpAt(checkpoints, reached)
       if (cp) enterChallenge(cp)
     })
   }
@@ -355,7 +318,7 @@ export default function Watch({ mode = 'student' }) {
             clockMs={replayer.clockMs}
             isPlaying={replayer.isPlaying}
             onPlayPause={() => (replayer.isPlaying ? replayer.pause() : startPlay())}
-            onSeek={(ms) => replayer.seek(ms)}
+            onSeek={onSeek}
             onMarkerClick={(cp) => replayer.seek(Math.min(cp.timestamp_ms, maxScrubMs))}
             checkpoints={checkpoints}
             progress={progress}
