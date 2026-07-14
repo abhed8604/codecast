@@ -7,12 +7,11 @@ import CodeEditor from '../components/CodeEditor.jsx'
 import OutputPanel from '../components/OutputPanel.jsx'
 import Timeline from '../components/Timeline.jsx'
 import DiffView from '../components/DiffView.jsx'
-import ChallengePanel from '../components/ChallengePanel.jsx'
 import Modal from '../components/Modal.jsx'
 import EmptyState from '../components/EmptyState.jsx'
 import { EditorSkeleton } from '../components/Skeleton.jsx'
 import { LanguageBadge } from '../components/Badges.jsx'
-import { ArrowLeftIcon, FlagIcon, CheckIcon } from '../components/Icons.jsx'
+import { ArrowLeftIcon, FlagIcon, CheckIcon, RunIcon, SkipIcon, ArrowRightIcon } from '../components/Icons.jsx'
 
 import { useReplayer } from '../hooks/useReplayer.js'
 import { useGrading } from '../hooks/useGrading.js'
@@ -37,6 +36,7 @@ export default function Watch({ mode = 'student' }) {
 
   const [view, setView] = useState('replay') // replay | challenge
   const [diffOpen, setDiffOpen] = useState(false) // comparison popup overlay
+  const [infoOpen, setInfoOpen] = useState(false) // checkpoint title/description popup
   const [activeCp, setActiveCp] = useState(null)
   const [initialCode, setInitialCode] = useState('')
   const [running, setRunning] = useState(false)
@@ -151,13 +151,17 @@ export default function Watch({ mode = 'student' }) {
       setOutput(res)
       const passed = grade(res.output || '', activeCp.timestamp_ms, activeCp.correct_output_delta)
       setRunResult({ passed })
+      pushToast(
+        passed ? 'Output matches — nicely done.' : "Output didn't match yet.",
+        passed ? 'success' : 'error'
+      )
     } catch (e) {
       setOutput({ output: '', error: e.message, status: 'error' })
       setRunResult({ passed: false })
     } finally {
       setRunning(false)
     }
-  }, [running, activeCp, tutorial, grade])
+  }, [running, activeCp, tutorial, grade, pushToast])
 
   function resolveAndShowDiff(status) {
     const studentCode = studentCodeRef.current || editableRef.current?.getValue() || ''
@@ -208,14 +212,10 @@ export default function Watch({ mode = 'student' }) {
         e.preventDefault()
         replayer.isPlaying ? replayer.pause() : startPlay()
       }
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && view === 'challenge') {
-        e.preventDefault()
-        runChallenge()
-      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [view, replayer, startPlay, runChallenge])
+  }, [view, replayer, startPlay])
 
   // ---- render -------------------------------------------------------------
   if (error) {
@@ -301,13 +301,53 @@ export default function Watch({ mode = 'student' }) {
             />
           )}
         </div>
-        <OutputPanel
-          className="h-[58vh]"
-          output={displayOutput?.output}
-          error={displayOutput?.error}
-          status={displayOutput?.error ? 'error' : 'success'}
-          running={running}
-        />
+        <div className="flex flex-col gap-3">
+          <OutputPanel
+            className="h-[58vh]"
+            output={displayOutput?.output}
+            error={displayOutput?.error}
+            status={displayOutput?.error ? 'error' : 'success'}
+            running={running}
+          />
+          {view === 'challenge' && activeCp && (
+            <div className="flex shrink-0 items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setInfoOpen(true)}
+                className="btn btn-ghost grid h-9 w-9 place-items-center rounded-full !px-0 text-base"
+                aria-label="Checkpoint info"
+                title="Checkpoint details"
+              >
+                ?
+              </button>
+              <button
+                type="button"
+                onClick={runChallenge}
+                disabled={running}
+                className="btn btn-ghost"
+              >
+                <RunIcon className="text-base" />
+                {running ? 'Running…' : 'Run'}
+              </button>
+              <button
+                type="button"
+                onClick={() => resolveAndShowDiff(CheckpointStatus.SKIPPED)}
+                className="btn btn-ghost"
+              >
+                <SkipIcon className="text-base" /> Skip
+              </button>
+              <button
+                type="button"
+                onClick={() => resolveAndShowDiff(CheckpointStatus.PASSED)}
+                disabled={!runResult?.passed}
+                className="btn btn-primary"
+                title={runResult?.passed ? 'Resume playback' : 'Pass a run to continue'}
+              >
+                Continue <ArrowRightIcon className="text-base" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Transport (replay only) */}
@@ -330,20 +370,6 @@ export default function Watch({ mode = 'student' }) {
           />
         </motion.div>
       )}
-
-      {/* Challenge bottom sheet */}
-      <ChallengePanel
-        open={view === 'challenge'}
-        checkpoint={activeCp}
-        index={activeCp ? checkpoints.findIndex((c) => c.id === activeCp.id) + 1 : 0}
-        total={checkpoints.length}
-        running={running}
-        result={runResult}
-        canContinue={!!runResult?.passed}
-        onRun={runChallenge}
-        onContinue={() => resolveAndShowDiff(CheckpointStatus.PASSED)}
-        onSkip={() => resolveAndShowDiff(CheckpointStatus.SKIPPED)}
-      />
 
       {/* Comparison popup — opens after the instructor's new output appears */}
       <Modal
@@ -372,6 +398,11 @@ export default function Watch({ mode = 'student' }) {
             Close
           </button>
         </div>
+      </Modal>
+
+      {/* Checkpoint info popup — title + description, opened via the "?" button */}
+      <Modal open={infoOpen} onClose={() => setInfoOpen(false)} title={activeCp?.title}>
+        <p className="text-[15px] leading-relaxed text-ink-muted">{activeCp?.objective}</p>
       </Modal>
     </div>
   )

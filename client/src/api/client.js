@@ -16,24 +16,16 @@ async function request(path, { method = 'GET', body, signal } = {}) {
     res = await fetch(`/api${path}`, opts)
   } catch (err) {
     if (err.name === 'AbortError') throw err
-    throw new ApiError('Network error — is the server running?', 0)
+    throw new Error('Network error — is the server running?')
   }
 
   const isJson = res.headers.get('content-type')?.includes('application/json')
   const payload = isJson ? await res.json().catch(() => null) : null
 
   if (!res.ok) {
-    throw new ApiError(payload?.error || `Request failed (${res.status})`, res.status)
+    throw new Error(payload?.error || `Request failed (${res.status})`)
   }
   return payload
-}
-
-export class ApiError extends Error {
-  constructor(message, status) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-  }
 }
 
 export const api = {

@@ -124,7 +124,7 @@ All have safe defaults — you only set them to override.
 | `DB_PATH`             | `./codecast.db`   | SQLite file, **relative to `server/db`** (so the server works from any working directory). |
 | `RUNNER_CONTAINER`   | `codecast-runner`  | Container name used for `docker exec`.       |
 | `RUNNER_TIME_LIMIT_S`| `5`               | Per-run wall-clock cap (applied inside the container). |
-| `RUNNER_MEM_LIMIT_KB`| `131072` (128MB) | Per-run virtual-memory cap.                 |
+| `RUNNER_MEM_LIMIT_KB`| `1048576` (1GB) | Per-run virtual-address-space cap (generous — C++ reserves large virtual ranges at startup). |
 | `MAX_OUTPUT_BYTES`   | `51200` (50KB)   | Cap on returned stdout.                       |
 
 ## Running on podman

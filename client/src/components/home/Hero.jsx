@@ -108,9 +108,20 @@ export default function Hero() {
 
         {/* Right — live demo */}
         <div className="relative">
-          {/* steady ambient backlight — kept out of the entrance fade so it never flashes */}
-          <div className="pointer-events-none absolute -inset-10 -z-10 rounded-[48px] bg-violet-primary/25 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-6 left-4 right-4 -z-10 h-24 rounded-full bg-violet-deep/40 blur-2xl" />
+          {/* Ambient backlight — fades in with the window so it never flashes
+              at full strength while the frosted panel is still transparent. */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="pointer-events-none absolute -inset-10 -z-10 rounded-[48px] bg-violet-primary/25 blur-3xl"
+          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="pointer-events-none absolute -bottom-6 left-4 right-4 -z-10 h-24 rounded-full bg-violet-deep/40 blur-2xl"
+          />
           <motion.div
             initial={{ opacity: 0, y: 30, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

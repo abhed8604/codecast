@@ -144,23 +144,10 @@ export const SparkIcon = (p) => (
   </svg>
 )
 
-export const BoltIcon = (p) => (
-  <svg {...base} {...p}>
-    <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="currentColor" stroke="none" />
-  </svg>
-)
-
 export const ShieldIcon = (p) => (
   <svg {...base} {...p}>
     <path d="M12 3 5 6v6c0 4 3 6.5 7 9 4-2.5 7-5 7-9V6l-7-3Z" />
     <path d="M9 12l2 2 4-4" />
-  </svg>
-)
-
-export const LayersIcon = (p) => (
-  <svg {...base} {...p}>
-    <path d="M12 3 3 8l9 5 9-5-9-5Z" />
-    <path d="M3 13l9 5 9-5M3 18l9 5 9-5" />
   </svg>
 )
 
@@ -172,13 +159,6 @@ export const WandIcon = (p) => (
       stroke="none"
     />
     <path d="M5 19l3-3M4 14l1 1M6 20l1-1" />
-  </svg>
-)
-
-export const GlobeIcon = (p) => (
-  <svg {...base} {...p}>
-    <circle cx="12" cy="12" r="9" />
-    <path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18" />
   </svg>
 )
 

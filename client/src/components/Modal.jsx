@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from './Icons.jsx'
@@ -30,6 +30,7 @@ export default function Modal({
   maxWidth = 'max-w-lg',
   bare = false,
 }) {
+  const panelRef = useRef(null)
   useEffect(() => {
     if (!open) return
     const onKey = (e) => e.key === 'Escape' && onClose?.()
@@ -50,9 +51,12 @@ export default function Modal({
           initial="hidden"
           animate="visible"
           exit="hidden"
-          onMouseDown={(e) => e.target === e.currentTarget && onClose?.()}
+          onPointerDown={(e) => {
+            if (!panelRef.current?.contains(e.target)) onClose?.()
+          }}
         >
           <motion.div
+            ref={panelRef}
             className={`modal-panel scrollbar-hide w-full ${maxWidth} max-h-[88vh] overflow-y-auto ${bare ? 'p-0' : 'p-7'}`}
             variants={panelVariants}
             initial="hidden"

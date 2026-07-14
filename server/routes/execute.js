@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid'
 import { writeFile, unlink } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { dockerExecWithRetry } from '../lib/dockerExec.js'
+import { dockerExecWithRetry, TIME_LIMIT_S, MEM_LIMIT_KB } from '../lib/dockerExec.js'
 import { httpError } from '../middleware/errorHandler.js'
 import { SUPPORTED_LANGUAGES } from '../lib/languages.js'
 
@@ -79,7 +79,10 @@ router.post('/', asyncHandler(async (req, res) => {
         })
       }
       created.push(bin)
-      const result = await dockerExecWithRetry(`/sandbox/${bin}`)
+      // Ensure the compiled binary is executable — some bind-mount/SELinux
+      // setups strip the +x bit that g++ sets, which would make the run fail
+      // (scripts like python/sql don't need it, so only C++ is affected).
+      const result = await dockerExecWithRetry(`chmod +x /sandbox/${bin} && /sandbox/${bin}`)
       return res.json(formatResult(result))
     }
   } finally {
@@ -91,11 +94,13 @@ function formatResult(result) {
   const output = truncate(result.stdout || '')
   const stderr = truncate(result.stderr || '')
   if (result.failed) {
-    // `timeout -s KILL` and OOM kills surface as a bare "Killed" (exit 137).
+    // `timeout -s KILL` and OOM kills surface as a bare "Killed" (exit 137)
+    // with empty stderr; otherwise surface the real diagnostic.
     const isLimit = !stderr || /^killed$/i.test(stderr)
+    const limitMsg = `Time or memory limit exceeded (${TIME_LIMIT_S}s / ${MEM_LIMIT_KB / 1024}MB).`
     return {
       output,
-      error: isLimit ? 'Time or memory limit exceeded (5s / 128MB).' : stderr,
+      error: isLimit ? limitMsg : stderr,
       status: 'error',
     }
   }

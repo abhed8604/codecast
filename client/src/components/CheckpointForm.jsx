@@ -20,16 +20,9 @@ export default function CheckpointForm({
   const [delta, setDelta] = useState(
     initial.correct_output_delta != null ? initial.correct_output_delta : suggestedDelta
   )
-  const [errors, setErrors] = useState({})
 
   function submit(e) {
     e.preventDefault()
-    const next = {}
-    if (!title.trim()) next.title = 'Give the checkpoint a short title.'
-    if (!objective.trim()) next.objective = 'Describe what the student should write.'
-    if (!delta.trim()) next.delta = 'Expected output cannot be empty.'
-    setErrors(next)
-    if (Object.keys(next).length) return
     onSubmit?.({
       title: title.trim(),
       objective: objective.trim(),
@@ -47,7 +40,7 @@ export default function CheckpointForm({
         </span>
       </div>
 
-      <Field label="Title" error={errors.title}>
+      <Field label="Title">
         <input
           className="field-input"
           value={title}
@@ -59,7 +52,6 @@ export default function CheckpointForm({
 
       <Field
         label="Objective"
-        error={errors.objective}
         helper="Shown to the student in the challenge panel. Be specific about the task."
       >
         <textarea
@@ -72,8 +64,7 @@ export default function CheckpointForm({
 
       <Field
         label="Expected new output"
-        error={errors.delta}
-        helper="Only the NEW output the student's code should add after this point. Auto-suggested from your recording — edit if needed."
+        helper="Only the NEW output the student's code should add after this point. Auto-suggested from your recording — edit if needed. Leave blank if there is no expected output."
       >
         <textarea
           className="field-input mono min-h-[88px] resize-y text-sm"
@@ -96,14 +87,12 @@ export default function CheckpointForm({
   )
 }
 
-function Field({ label, helper, error, children }) {
+function Field({ label, helper, children }) {
   return (
     <div className="flex flex-col gap-2">
       <label className="field-label">{label}</label>
       {children}
-      {error ? (
-        <p className="text-xs text-danger">{error}</p>
-      ) : helper ? (
+      {helper ? (
         <p className="text-xs leading-relaxed text-ink-faint">{helper}</p>
       ) : null}
     </div>

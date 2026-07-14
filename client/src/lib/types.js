@@ -52,5 +52,3 @@ export const LANGUAGES = Object.freeze({
   cpp: { id: 'cpp', label: 'C++', monaco: 'cpp', ext: 'cpp' },
   sql: { id: 'sql', label: 'SQL', monaco: 'sql', ext: 'sql' },
 })
-
-export {}

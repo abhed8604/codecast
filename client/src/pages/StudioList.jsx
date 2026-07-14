@@ -1,11 +1,11 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { api } from '../api/client.js'
 import Card from '../components/Card.jsx'
 import Modal from '../components/Modal.jsx'
 import EmptyState from '../components/EmptyState.jsx'
-import { ListSkeleton, EditorSkeleton } from '../components/Skeleton.jsx'
+import { ListSkeleton } from '../components/Skeleton.jsx'
 import { LanguageBadge, StatusBadge, formatDuration } from '../components/Badges.jsx'
 import {
   SlidersIcon,
@@ -17,15 +17,11 @@ import {
 import { useTutorialStore } from '../store/useTutorialStore.js'
 import { grid, item } from '../lib/motion.js'
 
-// Lazy so Monaco stays out of the Studio bundle until recording starts.
-const Record = lazy(() => import('../pages/Record.jsx'))
-
 export default function StudioList() {
   const navigate = useNavigate()
   const [tutorials, setTutorials] = useState(null)
   const [error, setError] = useState(null)
   const [pendingDelete, setPendingDelete] = useState(null)
-  const [recording, setRecording] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const pushToast = useTutorialStore((s) => s.pushToast)
 
@@ -76,7 +72,7 @@ export default function StudioList() {
             Your lessons
           </h1>
         </div>
-        <button onClick={() => setRecording(true)} className="btn btn-primary">
+        <button onClick={() => navigate('/lecture/studio/record')} className="btn btn-primary">
           <PlusIcon className="text-base" /> Record New
         </button>
       </header>
@@ -179,9 +175,6 @@ export default function StudioList() {
           </button>
         </div>
       </Modal>
-      <Suspense fallback={<EditorSkeleton label="Loading recorder" />}>
-        <Record embedded open={recording} onClose={() => setRecording(false)} />
-      </Suspense>
     </div>
   )
 }
