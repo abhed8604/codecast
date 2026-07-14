@@ -52,7 +52,7 @@ export function useReplayer({ eventLog, durationMs }) {
 
   const pushClock = useCallback((ms, force = false) => {
     const now = performance.now()
-      if (force || now - lastWriteRef.current > CLOCK_THROTTLE_MS) {
+    if (force || now - lastWriteRef.current > CLOCK_THROTTLE_MS) {
       lastWriteRef.current = now
       setClockMs(ms)
     }

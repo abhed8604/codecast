@@ -22,7 +22,14 @@ const panelVariants = {
  * The signature pop-out. Used app-wide for menus, forms, and confirmations.
  * Renders through a portal, traps Escape, and locks body scroll while open.
  */
-export default function Modal({ open, onClose, title, children, maxWidth = 'max-w-lg', bare = false }) {
+export default function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  maxWidth = 'max-w-lg',
+  bare = false,
+}) {
   useEffect(() => {
     if (!open) return
     const onKey = (e) => e.key === 'Escape' && onClose?.()

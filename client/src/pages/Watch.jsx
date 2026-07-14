@@ -86,7 +86,9 @@ export default function Watch({ mode = 'student' }) {
   }, [checkpoints, progress, durationMs])
 
   const allResolved = useMemo(
-    () => checkpoints.length > 0 && checkpoints.every((c) => progress[c.id] && progress[c.id] !== 'pending'),
+    () =>
+      checkpoints.length > 0 &&
+      checkpoints.every((c) => progress[c.id] && progress[c.id] !== 'pending'),
     [checkpoints, progress]
   )
 
@@ -127,7 +129,9 @@ export default function Watch({ mode = 'student' }) {
 
   // ---- challenge ----------------------------------------------------------
   function enterChallenge(cp) {
-    const instructorSoFar = replayEditorRef.current?.getValue() ?? reconstructAt(monacoRef.current, eventLog, langId, cp.timestamp_ms)
+    const instructorSoFar =
+      replayEditorRef.current?.getValue() ??
+      reconstructAt(monacoRef.current, eventLog, langId, cp.timestamp_ms)
     replayer.pause()
     replayer.detach()
     setActiveCp(cp)
@@ -278,7 +282,7 @@ export default function Watch({ mode = 'student' }) {
 
       {/* Main stage */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
-        <div className="h-[58vh] overflow-hidden rounded-card ring-1 ring-violet-primary/15">
+        <div className="h-[58vh] overflow-hidden rounded-card shadow-card ring-1 ring-violet-primary/15">
           {view === 'replay' ? (
             <ReplayEditor language={tutorial.language} onReady={onReplayReady} />
           ) : (
@@ -311,7 +315,7 @@ export default function Watch({ mode = 'student' }) {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-3 rounded-card bg-surface px-4 py-3 ring-1 ring-violet-primary/12"
+          className="mt-3 rounded-card bg-surface px-4 py-3 shadow-card ring-1 ring-violet-primary/12"
         >
           <Timeline
             durationMs={durationMs}
@@ -355,7 +359,7 @@ export default function Watch({ mode = 'student' }) {
         <p className="mb-4 text-sm leading-relaxed text-ink-muted">
           Green is what the instructor wrote; red is where your code diverged.
         </p>
-        <div className="h-[62vh] overflow-hidden rounded-card ring-1 ring-violet-primary/15">
+        <div className="h-[62vh] overflow-hidden rounded-card shadow-card ring-1 ring-violet-primary/15">
           <DiffView
             language={tutorial.language}
             original={diffData?.original || ''}

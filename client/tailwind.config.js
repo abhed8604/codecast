@@ -4,9 +4,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        void: '#06040B',
-        surface: '#0E0A14',
-        'surface-2': '#15101C',
+        void: '#050507',
+        surface: '#0B0B0F',
+        'surface-2': '#131318',
         violet: {
           primary: '#8B5CF6',
           deep: '#4C1D95',
@@ -38,11 +38,15 @@ export default {
       },
       boxShadow: {
         modal:
-          '0 0 0 1px rgba(139,92,246,0.15), 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(139,92,246,0.08)',
-        card: '0 12px 40px -18px rgba(0,0,0,0.6)',
+          '0 0 0 1px rgba(139,92,246,0.18), 0 36px 90px -28px rgba(0,0,0,0.85), 0 0 50px rgba(139,92,246,0.10)',
+        panel:
+          '0 30px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(139,92,246,0.10)',
+        card: '0 18px 50px -22px rgba(0,0,0,0.8)',
         'card-hover':
-          '0 0 0 1px rgba(139,92,246,0.35), 0 22px 50px -20px rgba(0,0,0,0.7), 0 0 32px rgba(139,92,246,0.10)',
-        sheet: '0 -12px 40px rgba(0,0,0,0.45)',
+          '0 0 0 1px rgba(139,92,246,0.40), 0 30px 64px -26px rgba(0,0,0,0.88), 0 0 38px rgba(139,92,246,0.14)',
+        sheet: '0 -24px 64px -24px rgba(0,0,0,0.8)',
+        float: '0 14px 34px -14px rgba(0,0,0,0.7)',
+        glow: '0 10px 30px -8px rgba(139,92,246,0.5)',
       },
       keyframes: {
         drift: {
@@ -60,12 +64,36 @@ export default {
           '0%, 49%': { opacity: '1' },
           '50%, 100%': { opacity: '0' },
         },
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        'marquee-reverse': {
+          '0%': { transform: 'translateX(-50%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+        'gradient-pan': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        'spin-slow': {
+          to: { transform: 'rotate(360deg)' },
+        },
       },
       animation: {
         drift: 'drift 24s ease-in-out infinite',
         'drift-slow': 'drift-slow 30s ease-in-out infinite',
         shimmer: 'shimmer 1.6s infinite',
         blink: 'blink 1s step-end infinite',
+        marquee: 'marquee 28s linear infinite',
+        'marquee-reverse': 'marquee-reverse 32s linear infinite',
+        'gradient-pan': 'gradient-pan 6s ease infinite',
+        float: 'float 6s ease-in-out infinite',
+        'spin-slow': 'spin-slow 18s linear infinite',
       },
     },
   },

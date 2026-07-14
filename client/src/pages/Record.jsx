@@ -111,7 +111,7 @@ export default function Record({ embedded = false, open = true, onClose }) {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className={embedded ? '' : 'rounded-panel bg-surface p-8 ring-1 ring-violet-primary/12'}
+          className={embedded ? '' : 'rounded-panel bg-surface p-8 shadow-card ring-1 ring-violet-primary/12'}
         >
           {!embedded && (
             <>
@@ -126,8 +126,7 @@ export default function Record({ embedded = false, open = true, onClose }) {
 
           {embedded && (
             <p className="mb-4 text-sm leading-relaxed text-ink-muted">
-              Give your lesson a title and language, then start capturing every
-              keystroke and run.
+              Give your lesson a title and language, then start capturing every keystroke and run.
             </p>
           )}
 
@@ -186,13 +185,13 @@ export default function Record({ embedded = false, open = true, onClose }) {
     )
   }
 
-    // recording / saving
-    else {
+  // recording / saving
+  else {
     content = (
-          <div
-            className={embedded ? '' : 'mx-auto max-w-[1400px] px-4 py-6 md:px-8'}
-            onKeyDown={onKeyDown}
-          >
+      <div
+        className={embedded ? '' : 'mx-auto max-w-[1400px] px-4 py-6 md:px-8'}
+        onKeyDown={onKeyDown}
+      >
         <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-2 rounded-full bg-danger/10 px-3 py-1.5 ring-1 ring-danger/25">
@@ -205,7 +204,11 @@ export default function Record({ embedded = false, open = true, onClose }) {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={runCode} disabled={running || phase === 'saving'} className="btn btn-ghost">
+            <button
+              onClick={runCode}
+              disabled={running || phase === 'saving'}
+              className="btn btn-ghost"
+            >
               <RunIcon className="text-base" /> {running ? 'Running...' : 'Run'}
             </button>
             <button
@@ -218,23 +221,23 @@ export default function Record({ embedded = false, open = true, onClose }) {
           </div>
         </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
-        <div className="h-[62vh] overflow-hidden rounded-card ring-1 ring-violet-primary/15">
-          <CodeEditor
-            language={meta.language}
-            onReady={onEditorReady}
-            onChange={onEditorChange}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
+          <div className="h-[62vh] overflow-hidden rounded-card shadow-card ring-1 ring-violet-primary/15">
+            <CodeEditor
+              language={meta.language}
+              onReady={onEditorReady}
+              onChange={onEditorChange}
+            />
+          </div>
+          <OutputPanel
+            className="h-[62vh]"
+            output={output?.output}
+            error={output?.error}
+            status={output?.status}
+            running={running}
           />
         </div>
-        <OutputPanel
-          className="h-[62vh]"
-          output={output?.output}
-          error={output?.error}
-          status={output?.status}
-          running={running}
-        />
       </div>
-    </div>
     )
   }
 

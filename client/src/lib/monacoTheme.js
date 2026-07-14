@@ -26,12 +26,12 @@ export function defineCodecastTheme(monacoInstance) {
       { token: 'function', foreground: '8B5CF6' },
     ],
     colors: {
-      'editor.background': '#16101F',
+      'editor.background': '#0B0B0F',
       'editor.foreground': '#F1EDF7',
       'editorLineNumber.foreground': '#4A4058',
       'editorCursor.foreground': '#8B5CF6',
       'editor.selectionBackground': '#4C1D9580',
-      'editorGutter.background': '#16101F',
+      'editorGutter.background': '#0B0B0F',
     },
   })
   defined = true

@@ -40,18 +40,78 @@ export default function App() {
       <Suspense fallback={<EditorSkeleton />}>
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Page><Home /></Page>} />
-            <Route path="/lecture" element={<Page><LectureHub /></Page>} />
-            <Route path="/lecture/student" element={<Page><StudentList /></Page>} />
-            <Route path="/lecture/student/:id" element={<Page><Watch mode="student" /></Page>} />
-            <Route path="/lecture/studio" element={<Page><StudioList /></Page>} />
-            <Route path="/lecture/studio/record" element={<Page><Record /></Page>} />
+            <Route
+              path="/"
+              element={
+                <Page>
+                  <Home />
+                </Page>
+              }
+            />
+            <Route
+              path="/lecture"
+              element={
+                <Page>
+                  <LectureHub />
+                </Page>
+              }
+            />
+            <Route
+              path="/lecture/student"
+              element={
+                <Page>
+                  <StudentList />
+                </Page>
+              }
+            />
+            <Route
+              path="/lecture/student/:id"
+              element={
+                <Page>
+                  <Watch mode="student" />
+                </Page>
+              }
+            />
+            <Route
+              path="/lecture/studio"
+              element={
+                <Page>
+                  <StudioList />
+                </Page>
+              }
+            />
+            <Route
+              path="/lecture/studio/record"
+              element={
+                <Page>
+                  <Record />
+                </Page>
+              }
+            />
             <Route
               path="/lecture/studio/:id/checkpoints"
-              element={<Page><CheckpointEditor /></Page>}
+              element={
+                <Page>
+                  <CheckpointEditor />
+                </Page>
+              }
             />
-            <Route path="/lecture/studio/:id/watch" element={<Page><Watch mode="studio" /></Page>} />
-            <Route path="*" element={<Page><Home /></Page>} />
+            <Route
+              path="/lecture/studio/:id/watch"
+              element={
+                <Page>
+                  <Watch mode="studio" />
+                </Page>
+              }
+            />
+            <Route
+              path="*"
+              element={
+                <Page>
+                  <Home />
+                </Page>
+              }
+            />
           </Routes>
         </AnimatePresence>
       </Suspense>

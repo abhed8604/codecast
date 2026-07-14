@@ -4,10 +4,10 @@
 
   :root {
     /* ---- Color tokens (single source of truth) ---- */
-    --bg-void: #06040b;
-    --bg-surface: #0e0a14;
-    --bg-surface-2: #15101c;
-    --bg-surface-blur: rgba(5, 3, 8, 0.86);
+    --bg-void: #050507;
+    --bg-surface: #0b0b0f;
+    --bg-surface-2: #131318;
+    --bg-surface-blur: rgba(6, 6, 9, 0.86);
     --violet-primary: #8b5cf6;
     --violet-deep: #4c1d95;
     --violet-glow: #c4b5fd;
@@ -100,9 +100,9 @@
     background: var(--bg-surface);
     border-radius: 32px;
     box-shadow:
-      0 0 0 1px rgba(139, 92, 246, 0.15),
-      0 20px 60px rgba(0, 0, 0, 0.5),
-      0 0 40px rgba(139, 92, 246, 0.08);
+      0 0 0 1px rgba(139, 92, 246, 0.18),
+      0 36px 90px -28px rgba(0, 0, 0, 0.85),
+      0 0 50px rgba(139, 92, 246, 0.1);
   }
 
   /* ---- Bottom sheet (ChallengePanel) ---- */
@@ -111,7 +111,7 @@
     border-top-left-radius: 24px;
     border-top-right-radius: 24px;
     border-top: 1px solid rgba(196, 181, 253, 0.35);
-    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 -24px 64px -24px rgba(0, 0, 0, 0.8);
   }
 
   /* ---- Frosted panel language (toasts, popovers) ---- */
@@ -120,6 +120,7 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(196, 181, 253, 0.14);
+    box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.7);
   }
 
   /* ---- DiffView tints (layered over Monaco's own diff highlighting) ---- */
@@ -186,7 +187,7 @@
   }
   .btn-primary:not(:disabled):hover {
     background: #9d70f7;
-    box-shadow: 0 0 24px rgba(139, 92, 246, 0.28);
+    box-shadow: 0 10px 30px -8px rgba(139, 92, 246, 0.5);
   }
   .btn-ghost {
     background: rgba(139, 92, 246, 0.08);
@@ -196,6 +197,7 @@
   .btn-ghost:not(:disabled):hover {
     background: rgba(139, 92, 246, 0.16);
     border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 8px 22px -10px rgba(139, 92, 246, 0.35);
   }
   .btn-danger {
     background: rgba(239, 68, 68, 0.12);
@@ -241,7 +243,56 @@
   }
 }
 
-/* Respect reduced motion for perpetual animations. */
+  /* ---- Landing-page utilities ---- */
+  .bg-grid {
+    background-image: radial-gradient(rgba(139, 92, 246, 0.08) 1px, transparent 1px);
+    background-size: 38px 38px;
+  }
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 12%,
+      #000 88%,
+      transparent
+    );
+    mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  }
+  /* Cursor-tracking spotlight border (driven by --mx/--my custom props). */
+  .spotlight {
+    position: relative;
+  }
+  .spotlight::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(
+      240px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(196, 181, 253, 0.55),
+      transparent 60%
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .spotlight:hover::before {
+    opacity: 1;
+  }
+  .text-stroke-gradient {
+    background: linear-gradient(90deg, #c4b5fd, #8b5cf6, #c4b5fd);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Respect reduced motion for perpetual animations. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

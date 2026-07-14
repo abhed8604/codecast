@@ -42,8 +42,7 @@ export default function CheckpointForm({
       <div className="flex items-center gap-2 rounded-control bg-violet-primary/8 px-3.5 py-2 ring-1 ring-violet-primary/15">
         <FlagIcon className="text-base text-violet-glow" />
         <span className="mono text-sm text-ink-muted">
-          Triggers at{' '}
-          <span className="text-violet-glow">{formatDuration(timestampMs)}</span>{' '}
+          Triggers at <span className="text-violet-glow">{formatDuration(timestampMs)}</span>{' '}
           <span className="text-ink-faint">({Math.round(timestampMs)}ms)</span>
         </span>
       </div>

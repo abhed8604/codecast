@@ -10,7 +10,9 @@ export default function OutputPanel({ output, error, status, running, className 
   const hasContent = !!output || !!error
 
   return (
-    <div className={`flex min-h-0 flex-col overflow-hidden rounded-card bg-void ring-1 ring-violet-primary/12 ${className}`}>
+    <div
+      className={`flex min-h-0 flex-col overflow-hidden rounded-card bg-void ring-1 ring-violet-primary/12 ${className}`}
+    >
       <div className="flex items-center justify-between border-b border-violet-primary/10 px-4 py-2.5">
         <span className="mono inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.16em] text-ink-muted">
           <TerminalIcon className="text-sm" /> Output

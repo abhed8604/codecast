@@ -76,10 +76,7 @@ export default function StudioList() {
             Your lessons
           </h1>
         </div>
-        <button
-          onClick={() => setRecording(true)}
-          className="btn btn-primary"
-        >
+        <button onClick={() => setRecording(true)} className="btn btn-primary">
           <PlusIcon className="text-base" /> Record New
         </button>
       </header>

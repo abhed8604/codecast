@@ -14,13 +14,7 @@ import { latestExecutionUpTo } from '../lib/replayer.js'
 import { nextCheckpointAfter } from '../lib/checkpoints.js'
 import { api } from '../api/client.js'
 import { useTutorialStore } from '../store/useTutorialStore.js'
-import {
-  ArrowLeftIcon,
-  PlusIcon,
-  FlagIcon,
-  PencilIcon,
-  TrashIcon,
-} from '../components/Icons.jsx'
+import { ArrowLeftIcon, PlusIcon, FlagIcon, PencilIcon, TrashIcon } from '../components/Icons.jsx'
 
 export default function CheckpointEditor() {
   const { id } = useParams()
@@ -190,10 +184,7 @@ export default function CheckpointEditor() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(`/lecture/studio/${id}/watch`)}
-            className="btn btn-ghost"
-          >
+          <button onClick={() => navigate(`/lecture/studio/${id}/watch`)} className="btn btn-ghost">
             Self-test
           </button>
           <button
@@ -213,17 +204,15 @@ export default function CheckpointEditor() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
         {/* Replay + output */}
         <div className="flex flex-col gap-4">
-          <div className="h-[52vh] overflow-hidden rounded-card ring-1 ring-violet-primary/15">
+          <div className="h-[52vh] overflow-hidden rounded-card shadow-card ring-1 ring-violet-primary/15">
             <ReplayEditor language={tutorial.language} onReady={onEditorReady} />
           </div>
-          <div className="rounded-card bg-surface p-4 ring-1 ring-violet-primary/12">
+          <div className="rounded-card bg-surface p-4 shadow-card ring-1 ring-violet-primary/12">
             <Timeline
               durationMs={durationMs}
               clockMs={replayer.clockMs}
               isPlaying={replayer.isPlaying}
-              onPlayPause={() =>
-                replayer.isPlaying ? replayer.pause() : replayer.play()
-              }
+              onPlayPause={() => (replayer.isPlaying ? replayer.pause() : replayer.play())}
               onSeek={onSeek}
               onMarkerClick={(cp) => replayer.seek(cp.timestamp_ms)}
               checkpoints={checkpoints}
@@ -243,7 +232,7 @@ export default function CheckpointEditor() {
             status={baselineOutput?.error ? 'error' : 'success'}
           />
 
-          <div className="flex min-h-0 flex-1 flex-col rounded-card bg-surface ring-1 ring-violet-primary/12">
+          <div className="flex min-h-0 flex-1 flex-col rounded-card bg-surface shadow-card ring-1 ring-violet-primary/12">
             <div className="flex items-center justify-between border-b border-violet-primary/10 px-4 py-3">
               <span className="mono inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.16em] text-ink-muted">
                 <FlagIcon className="text-sm text-violet-glow" /> Checkpoints

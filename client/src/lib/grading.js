@@ -25,7 +25,7 @@ export function normalize(str) {
 export function getBaselineOutputAt(eventLog, timestampMs) {
   const executions = eventLog.filter((e) => e.type === 'execution')
   const idx = lastIndexAtOrBefore(executions, timestampMs)
-  return idx >= 0 ? executions[idx].output ?? '' : ''
+  return idx >= 0 ? (executions[idx].output ?? '') : ''
 }
 
 /**

@@ -11,7 +11,8 @@ export default function LectureHub() {
           Where do you want to start?
         </h1>
         <p className="mt-4 text-[15px] leading-relaxed text-ink-muted">
-          Jump into published lessons as a student, or open the studio to record and author your own.
+          Jump into published lessons as a student, or open the studio to record and author your
+          own.
         </p>
       </div>
       <ModeCards />

@@ -5,7 +5,13 @@ import { motion } from 'framer-motion'
  * violet border-glow. No tilt, no 3D. Used on tutorial list cards and the
  * Student/Studio mode-select cards.
  */
-export default function Card({ children, className = '', onClick, as = 'div', interactive = true }) {
+export default function Card({
+  children,
+  className = '',
+  onClick,
+  as = 'div',
+  interactive = true,
+}) {
   const Component = motion[as] || motion.div
   return (
     <Component

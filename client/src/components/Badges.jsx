@@ -29,9 +29,7 @@ export function StatusBadge({ status }) {
           : 'bg-ink-faint/20 text-ink-muted ring-ink-faint/30'
       }`}
     >
-      <span
-        className={`h-1.5 w-1.5 rounded-full ${published ? 'bg-success' : 'bg-ink-muted'}`}
-      />
+      <span className={`h-1.5 w-1.5 rounded-full ${published ? 'bg-success' : 'bg-ink-muted'}`} />
       {published ? 'Published' : 'Draft'}
     </span>
   )

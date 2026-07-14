@@ -17,7 +17,13 @@ const replayOptions = {
   cursorStyle: 'line',
   padding: { top: 16, bottom: 16 },
   renderLineHighlight: 'none',
-  scrollbar: { verticalScrollbarSize: 0, horizontalScrollbarSize: 0, useShadows: false, handleMouseWheel: true, overviewRulerLanes: 0 },
+  scrollbar: {
+    verticalScrollbarSize: 0,
+    horizontalScrollbarSize: 0,
+    useShadows: false,
+    handleMouseWheel: true,
+    overviewRulerLanes: 0,
+  },
   automaticLayout: true,
   overviewRulerLanes: 0,
   // Keep the caret visible during read-only replay so it reads as "typing".

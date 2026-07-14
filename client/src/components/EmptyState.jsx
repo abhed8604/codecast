@@ -10,7 +10,7 @@ export default function EmptyState({ icon: Icon, title, description, action }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 200, damping: 24 }}
-      className="mx-auto flex max-w-md flex-col items-center rounded-panel bg-surface/60 px-8 py-16 text-center ring-1 ring-violet-primary/10"
+      className="mx-auto flex max-w-md flex-col items-center rounded-panel bg-surface/60 px-8 py-16 text-center shadow-card ring-1 ring-violet-primary/10"
     >
       {Icon && (
         <div className="mb-6 grid h-16 w-16 place-items-center rounded-2xl bg-violet-primary/10 text-3xl text-violet-glow ring-1 ring-violet-primary/20">
