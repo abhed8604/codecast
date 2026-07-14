@@ -1,6 +1,6 @@
 import Editor from '@monaco-editor/react'
 import '../lib/monacoSetup.js'
-import { defineCodecastTheme, THEME_NAME } from '../lib/monacoTheme.js'
+import { defineCodecastTheme, currentThemeName } from '../lib/monacoTheme.js'
 import { LANGUAGES } from '../lib/types.js'
 
 const replayOptions = {
@@ -39,7 +39,6 @@ export default function ReplayEditor({ language, onReady, height = '100%' }) {
 
   function handleMount(editor, monaco) {
     defineCodecastTheme(monaco)
-    monaco.editor.setTheme(THEME_NAME)
     editor.getModel()?.setValue('')
     onReady?.(editor, monaco)
   }
@@ -47,7 +46,7 @@ export default function ReplayEditor({ language, onReady, height = '100%' }) {
   return (
     <Editor
       height={height}
-      theme={THEME_NAME}
+      theme={currentThemeName()}
       language={monacoLang}
       defaultValue=""
       onMount={handleMount}

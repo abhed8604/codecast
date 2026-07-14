@@ -3,33 +3,96 @@
 @tailwind utilities;
 
   :root {
-    /* ---- Color tokens (single source of truth) ---- */
-    --bg-void: #050507;
-    --bg-surface: #0b0b0f;
-    --bg-surface-2: #131318;
-    --bg-surface-blur: rgba(6, 6, 9, 0.86);
-    --violet-primary: #8b5cf6;
-    --violet-deep: #4c1d95;
-    --violet-glow: #c4b5fd;
-    --text-primary: #f1edf7;
-    --text-muted: #948aa3;
+    /* ---- Color tokens (single source of truth) ----
+       Stored as RGB triplets so they can be re-themed per mode while Tailwind
+       alpha modifiers (e.g. `surface/12`, `violet-primary/12`) keep working. */
+    --bg-void: 5 5 7;
+    --bg-surface: 11 11 15;
+    --bg-surface-2: 19 19 24;
+    --bg-surface-blur: 6 6 9;
+    --violet-primary: 139 92 246;
+    --violet-deep: 76 29 149;
+    --violet-glow: 196 181 253;
+    --text-primary: 241 237 247;
+    --text-muted: 148 138 163;
+    --text-faint: 74 64 88;
     --danger: #ef4444;
     --success: #22c55e;
   }
 
+  /* Checkpoint mode — the WHOLE document shifts from black-violet to
+     black-blue (cool blue-black background, blue accents, slate text),
+     signalling the student is now solving. Every neutral + accent token is
+     overridden. */
+  [data-mode='challenge'] {
+    --bg-void: 7 10 15;
+    --bg-surface: 13 18 26;
+    --bg-surface-2: 20 27 38;
+    --bg-surface-blur: 10 14 20;
+    --violet-primary: 59 130 246;
+    --violet-deep: 29 78 216;
+    --violet-glow: 147 197 253;
+    --text-primary: 241 245 249;
+    --text-muted: 148 163 184;
+    --text-faint: 71 85 105;
+  }
+
+  /* Smooth cross-fade of the theme swap on the surfaces that carry accent
+     color. Scoped to properties only (never transform) to avoid hover jank.
+     A long, gentle curve so replay <-> challenge feels like one continuous
+     shift rather than a cut. */
+  html {
+    transition:
+      background-color 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  html * {
+    transition:
+      background-color 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      fill 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  /* Keep the code editor crisp — never animate selection/scroll repaints.
+     The editor swap itself is cross-faded in JS (Watch) instead. */
+  .monaco-editor,
+  .monaco-editor * {
+    transition: none;
+  }
+
+  /* Ambient amber glow that lives behind the whole page in checkpoint mode.
+     The element is always present; only its opacity flips with the mode, so
+     it fades in/out smoothly alongside the rest of the theme. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    background:
+      radial-gradient(70% 45% at 50% -5%, rgb(var(--violet-primary) / 0.12), transparent 70%),
+      radial-gradient(40% 30% at 85% 10%, rgb(var(--violet-glow) / 0.06), transparent 70%);
+  }
+  [data-mode='challenge'] body::before {
+    opacity: 1;
+  }
+
 @layer base {
   * {
-    border-color: rgba(139, 92, 246, 0.12);
+    border-color: rgb(var(--violet-primary) / 0.12);
   }
 
   html {
-    background-color: var(--bg-void);
+    background-color: rgb(var(--bg-void));
   }
 
   body {
     margin: 0;
-    background-color: var(--bg-void);
-    color: var(--text-primary);
+    background-color: rgb(var(--bg-void));
+    color: rgb(var(--text-primary));
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 16px;
     line-height: 1.6;
@@ -46,14 +109,14 @@
   }
 
   ::selection {
-    background: rgba(76, 29, 149, 0.5);
-    color: var(--text-primary);
+    background: rgb(var(--violet-deep) / 0.5);
+    color: rgb(var(--text-primary));
   }
 
   /* Visible, keyboard-first focus states everywhere. */
   :focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px var(--bg-void), 0 0 0 4px var(--violet-glow);
+    box-shadow: 0 0 0 2px rgb(var(--bg-void)), 0 0 0 4px rgb(var(--violet-glow));
     border-radius: 8px;
   }
 
@@ -66,13 +129,13 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(139, 92, 246, 0.25);
+    background: rgb(var(--violet-primary) / 0.25);
     border-radius: 999px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(139, 92, 246, 0.45);
+    background: rgb(var(--violet-primary) / 0.45);
     background-clip: padding-box;
   }
 
@@ -92,34 +155,34 @@
      Less blur, more darken so the rest of the screen reads as a
      dim backdrop rather than a frosted wash. */
   .modal-backdrop {
-    background: rgba(5, 3, 8, 0.86);
+    background: rgb(var(--bg-void) / 0.86);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
   .modal-panel {
-    background: var(--bg-surface);
+    background: rgb(var(--bg-surface));
     border-radius: 32px;
     box-shadow:
-      0 0 0 1px rgba(139, 92, 246, 0.18),
+      0 0 0 1px rgb(var(--violet-primary) / 0.18),
       0 36px 90px -28px rgba(0, 0, 0, 0.85),
-      0 0 50px rgba(139, 92, 246, 0.1);
+      0 0 50px rgb(var(--violet-primary) / 0.1);
   }
 
   /* ---- Bottom sheet (ChallengePanel) ---- */
   .sheet-panel {
-    background: var(--bg-surface);
+    background: rgb(var(--bg-surface));
     border-top-left-radius: 24px;
     border-top-right-radius: 24px;
-    border-top: 1px solid rgba(196, 181, 253, 0.35);
+    border-top: 1px solid rgb(var(--violet-glow) / 0.35);
     box-shadow: 0 -24px 64px -24px rgba(0, 0, 0, 0.8);
   }
 
   /* ---- Frosted panel language (toasts, popovers) ---- */
   .frost {
-    background: var(--bg-surface-blur);
+    background: rgb(var(--bg-surface-blur) / 0.86);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(196, 181, 253, 0.14);
+    border: 1px solid rgb(var(--violet-glow) / 0.14);
     box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.7);
   }
 
@@ -181,23 +244,23 @@
     cursor: not-allowed;
   }
   .btn-primary {
-    background: var(--violet-primary);
+    background: rgb(var(--violet-primary));
     color: #120b1c;
     font-weight: 600;
   }
   .btn-primary:not(:disabled):hover {
-    background: #9d70f7;
-    box-shadow: 0 10px 30px -8px rgba(139, 92, 246, 0.5);
+    filter: brightness(1.08);
+    box-shadow: 0 10px 30px -8px rgb(var(--violet-primary) / 0.5);
   }
   .btn-ghost {
-    background: rgba(139, 92, 246, 0.08);
-    color: var(--text-primary);
-    border: 1px solid rgba(139, 92, 246, 0.18);
+    background: rgb(var(--violet-primary) / 0.08);
+    color: rgb(var(--text-primary));
+    border: 1px solid rgb(var(--violet-primary) / 0.18);
   }
   .btn-ghost:not(:disabled):hover {
-    background: rgba(139, 92, 246, 0.16);
-    border-color: rgba(139, 92, 246, 0.4);
-    box-shadow: 0 8px 22px -10px rgba(139, 92, 246, 0.35);
+    background: rgb(var(--violet-primary) / 0.16);
+    border-color: rgb(var(--violet-primary) / 0.4);
+    box-shadow: 0 8px 22px -10px rgb(var(--violet-primary) / 0.35);
   }
   .btn-danger {
     background: rgba(239, 68, 68, 0.12);
@@ -214,28 +277,28 @@
     font-size: 13px;
     font-weight: 500;
     letter-spacing: 0.02em;
-    color: var(--text-muted);
+    color: rgb(var(--text-muted));
     text-transform: none;
   }
   .field-input {
     width: 100%;
-    background: var(--bg-void);
-    border: 1px solid rgba(139, 92, 246, 0.18);
+    background: rgb(var(--bg-void));
+    border: 1px solid rgb(var(--violet-primary) / 0.18);
     border-radius: 10px;
     padding: 0.65rem 0.85rem;
-    color: var(--text-primary);
+    color: rgb(var(--text-primary));
     font-size: 15px;
     transition:
       border-color 0.2s ease,
       box-shadow 0.2s ease;
   }
   .field-input::placeholder {
-    color: #5a5068;
+    color: rgb(var(--text-faint));
   }
   .field-input:focus {
     outline: none;
-    border-color: rgba(139, 92, 246, 0.6);
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+    border-color: rgb(var(--violet-primary) / 0.6);
+    box-shadow: 0 0 0 3px rgb(var(--violet-primary) / 0.15);
   }
 
   .mono {
@@ -245,7 +308,7 @@
 
   /* ---- Landing-page utilities ---- */
   .bg-grid {
-    background-image: radial-gradient(rgba(139, 92, 246, 0.08) 1px, transparent 1px);
+    background-image: radial-gradient(rgb(var(--violet-primary) / 0.08) 1px, transparent 1px);
     background-size: 38px 38px;
   }
   .marquee-mask {
@@ -270,7 +333,7 @@
     padding: 1px;
     background: radial-gradient(
       240px circle at var(--mx, 50%) var(--my, 50%),
-      rgba(196, 181, 253, 0.55),
+      rgb(var(--violet-glow) / 0.55),
       transparent 60%
     );
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);

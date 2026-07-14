@@ -6,7 +6,7 @@ import { SCRUB_THROTTLE_MS } from '../lib/constants.js'
 
 const markerColor = {
   [CheckpointStatus.PASSED]: 'bg-success ring-success/40',
-  [CheckpointStatus.SKIPPED]: 'bg-[#EAB308] ring-[#EAB308]/40',
+  [CheckpointStatus.SKIPPED]: 'bg-violet-primary ring-violet-primary/40',
   pending: 'bg-ink-muted ring-ink-muted/40',
 }
 
@@ -165,7 +165,7 @@ export default function Timeline({
 
         {/* playhead handle */}
         <div
-          className="pointer-events-none absolute top-1/2 z-20 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-glow shadow-[0_0_12px_rgba(196,181,253,0.6)] ring-2 ring-void"
+          className="pointer-events-none absolute top-1/2 z-20 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-glow shadow-[0_0_12px_rgb(var(--violet-glow)/0.6)] ring-2 ring-void"
           style={{ left: `${pct}%` }}
         />
       </div>

@@ -1,6 +1,6 @@
 import Editor from '@monaco-editor/react'
 import '../lib/monacoSetup.js'
-import { defineCodecastTheme, THEME_NAME } from '../lib/monacoTheme.js'
+import { defineCodecastTheme, currentThemeName } from '../lib/monacoTheme.js'
 import { LANGUAGES } from '../lib/types.js'
 
 const baseOptions = {
@@ -45,14 +45,13 @@ export default function CodeEditor({
 
   function handleMount(editor, monaco) {
     defineCodecastTheme(monaco)
-    monaco.editor.setTheme(THEME_NAME)
     onReady?.(editor, monaco)
   }
 
   return (
     <Editor
       height={height}
-      theme={THEME_NAME}
+      theme={currentThemeName()}
       language={monacoLang}
       value={value}
       defaultValue={defaultValue}

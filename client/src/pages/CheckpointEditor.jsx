@@ -53,6 +53,14 @@ export default function CheckpointEditor() {
     }
   }, [id, pushToast])
 
+  // This page is an editor for checkpoints, so treat it like checkpoint mode:
+  // the whole document (chrome + code editor) shifts to black-yellow.
+  useEffect(() => {
+    const root = document.documentElement
+    root.setAttribute('data-mode', 'challenge')
+    return () => root.removeAttribute('data-mode')
+  }, [])
+
   const onEditorReady = useCallback(
     (editor) => {
       replayer.attach(editor)

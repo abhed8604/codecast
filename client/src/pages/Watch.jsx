@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 
 import ReplayEditor from '../components/ReplayEditor.jsx'
 import CodeEditor from '../components/CodeEditor.jsx'
@@ -28,7 +28,6 @@ export default function Watch({ mode = 'student' }) {
   const pushToast = useTutorialStore((s) => s.pushToast)
   const loadProgress = useTutorialStore((s) => s.loadProgress)
   const setCheckpointStatus = useTutorialStore((s) => s.setCheckpointStatus)
-  const resetProgress = useTutorialStore((s) => s.resetProgress)
   const progress = useTutorialStore((s) => s.progress)
 
   const [tutorial, setTutorial] = useState(null)
@@ -48,7 +47,6 @@ export default function Watch({ mode = 'student' }) {
   const editableRef = useRef(null)
   const monacoRef = useRef(null)
   const studentCodeRef = useRef('') // live student code, robust to ref flushes
-  const pendingActionRef = useRef(null) // deferred play target for ReplayEditor remounts
   const resumeRef = useRef(0) // where playback continues after the diff popup closes
 
   const eventLog = useMemo(() => tutorial?.event_log || [], [tutorial])
@@ -78,6 +76,16 @@ export default function Watch({ mode = 'student' }) {
       alive = false
     }
   }, [id, loadProgress, pushToast])
+
+  // Re-theme the whole document to "checkpoint mode" (black-yellow) while the
+  // student is solving. Cleaned up on exit/unmount so we always revert to the
+  // default black-violet theme.
+  useEffect(() => {
+    const root = document.documentElement
+    if (view === 'challenge') root.setAttribute('data-mode', 'challenge')
+    else root.removeAttribute('data-mode')
+    return () => root.removeAttribute('data-mode')
+  }, [view])
 
   // ---- derived, reactive --------------------------------------------------
   const maxScrubMs = useMemo(() => {
@@ -115,14 +123,7 @@ export default function Watch({ mode = 'student' }) {
       replayEditorRef.current = editor
       monacoRef.current = monaco
       replayer.attach(editor)
-      const action = pendingActionRef.current
-      pendingActionRef.current = null
-      if (action) {
-        replayer.seek(action.seekMs)
-        if (action.playTo != null) replayer.play(action.playTo, action.onReach)
-      } else {
-        replayer.seek(0)
-      }
+      replayer.seek(0)
     },
     [replayer]
   )
@@ -180,12 +181,14 @@ export default function Watch({ mode = 'student' }) {
     const diffUntil = nextExec ? nextExec.t : segEnd
 
     resumeRef.current = nextCheckpointAfter(checkpoints, cp.timestamp_ms, durationMs) // where playback continues after closing
-    // Defer the play to the ReplayEditor remount (view -> 'replay').
-    pendingActionRef.current = {
-      seekMs: startMs,
-      playTo: diffUntil > startMs + 1 ? diffUntil : null,
-      onReach: () => setDiffOpen(true),
-    }
+    // The ReplayEditor now stays mounted across modes, so re-attach the replayer
+    // to it and run the deferred playback inline instead of waiting for a
+    // remount that no longer happens.
+    const editor = replayEditorRef.current
+    if (editor) replayer.attach(editor)
+    replayer.seek(startMs)
+    if (diffUntil > startMs + 1) replayer.play(diffUntil, () => setDiffOpen(true))
+    else setDiffOpen(true)
     setView('replay')
   }
 
@@ -266,51 +269,16 @@ export default function Watch({ mode = 'student' }) {
             )}
           </div>
         </div>
-        {mode === 'studio' && (
-          <button
-            onClick={() => {
-              resetProgress(id)
-              replayer.seek(0)
-              pushToast('Progress reset', 'info')
-            }}
-            className="btn btn-ghost"
-          >
-            Reset progress
-          </button>
-        )}
-      </div>
-
-      {/* Main stage */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
-        <div className="h-[58vh] overflow-hidden rounded-card shadow-card ring-1 ring-violet-primary/15">
-          {view === 'replay' ? (
-            <ReplayEditor language={tutorial.language} onReady={onReplayReady} />
-          ) : (
-            <CodeEditor
-              key={activeCp?.id}
-              language={tutorial.language}
-              defaultValue={initialCode}
-              onChange={(val) => {
-                studentCodeRef.current = val ?? ''
-              }}
-              onReady={(editor, monaco) => {
-                editableRef.current = editor
-                monacoRef.current = monaco
-                studentCodeRef.current = editor.getValue()
-              }}
-            />
-          )}
-        </div>
-        <div className="flex flex-col gap-3">
-          <OutputPanel
-            className="h-[58vh]"
-            output={displayOutput?.output}
-            error={displayOutput?.error}
-            status={displayOutput?.error ? 'error' : 'success'}
-            running={running}
-          />
+        <AnimatePresence>
           {view === 'challenge' && activeCp && (
-            <div className="flex shrink-0 items-center justify-end gap-2">
+            <motion.div
+              key="cp-actions"
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              className="flex shrink-0 items-center gap-2"
+            >
               <button
                 type="button"
                 onClick={() => setInfoOpen(true)}
@@ -345,18 +313,66 @@ export default function Watch({ mode = 'student' }) {
               >
                 Continue <ArrowRightIcon className="text-base" />
               </button>
-            </div>
+            </motion.div>
           )}
+        </AnimatePresence>
+      </div>
+
+      {/* Main stage */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
+        <div className="relative h-[58vh] overflow-hidden rounded-card shadow-card ring-1 ring-violet-primary/15">
+          {/* Both editors stay mounted and we only cross-fade their visibility.
+              This avoids remounting Monaco on mode switch (which would blank the
+              editor, discard its model, then refill it — the "blink"). The theme
+              itself still flips in place via the global data-mode observer. */}
+          <div
+            className={`absolute inset-0 transition-opacity duration-300 ${
+              view === 'replay' ? 'opacity-100' : 'pointer-events-none opacity-0'
+            }`}
+          >
+            <ReplayEditor language={tutorial.language} onReady={onReplayReady} />
+          </div>
+          <div
+            className={`absolute inset-0 transition-opacity duration-300 ${
+              view === 'challenge' ? 'opacity-100' : 'pointer-events-none opacity-0'
+            }`}
+          >
+            <CodeEditor
+              key={activeCp?.id}
+              language={tutorial.language}
+              defaultValue={initialCode}
+              onChange={(val) => {
+                studentCodeRef.current = val ?? ''
+              }}
+              onReady={(editor, monaco) => {
+                editableRef.current = editor
+                monacoRef.current = monaco
+                studentCodeRef.current = editor.getValue()
+              }}
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-3">
+          <OutputPanel
+            className="h-[58vh]"
+            output={displayOutput?.output}
+            error={displayOutput?.error}
+            status={displayOutput?.error ? 'error' : 'success'}
+            running={running}
+          />
         </div>
       </div>
 
-      {/* Transport (replay only) */}
-      {view === 'replay' && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-3 rounded-card bg-surface px-4 py-3 shadow-card ring-1 ring-violet-primary/12"
-        >
+      {/* Transport — rendered identically in both modes so the layout never
+          shifts. While a checkpoint is being solved it's made non-interactive
+          (pointer-events only, no visual change) so scrubbing/playing can't
+          discard in-progress work. */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-3 rounded-card bg-surface px-4 py-3 shadow-card ring-1 ring-violet-primary/12"
+      >
+        <div className={view === 'challenge' ? 'pointer-events-none' : ''}>
           <Timeline
             durationMs={durationMs}
             clockMs={replayer.clockMs}
@@ -368,8 +384,8 @@ export default function Watch({ mode = 'student' }) {
             progress={progress}
             maxScrubMs={maxScrubMs}
           />
-        </motion.div>
-      )}
+        </div>
+      </motion.div>
 
       {/* Comparison popup — opens after the instructor's new output appears */}
       <Modal

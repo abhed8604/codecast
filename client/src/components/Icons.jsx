@@ -113,8 +113,8 @@ export const BookIcon = (p) => (
 export const SlidersIcon = (p) => (
   <svg {...base} {...p}>
     <path d="M4 8h10M18 8h2M4 16h4M12 16h8" />
-    <circle cx="15" cy="8" r="2.2" fill="var(--bg-surface)" />
-    <circle cx="9.5" cy="16" r="2.2" fill="var(--bg-surface)" />
+    <circle cx="15" cy="8" r="2.2" fill="rgb(var(--bg-surface))" />
+    <circle cx="9.5" cy="16" r="2.2" fill="rgb(var(--bg-surface))" />
   </svg>
 )
 

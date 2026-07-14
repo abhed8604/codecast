@@ -1,9 +1,9 @@
 import { LANGUAGES } from '../lib/types.js'
 
 const langStyles = {
-  python: 'text-[#E9D5FF] bg-violet-primary/12 ring-violet-primary/20',
-  cpp: 'text-[#C4B5FD] bg-violet-deep/25 ring-violet-primary/20',
-  sql: 'text-[#A78BFA] bg-violet-primary/10 ring-violet-primary/20',
+  python: 'text-violet-glow bg-violet-primary/12 ring-violet-primary/20',
+  cpp: 'text-violet-glow bg-violet-deep/25 ring-violet-primary/20',
+  sql: 'text-violet-glow bg-violet-primary/10 ring-violet-primary/20',
 }
 
 export function LanguageBadge({ language }) {

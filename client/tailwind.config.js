@@ -4,18 +4,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        void: '#050507',
-        surface: '#0B0B0F',
-        'surface-2': '#131318',
+        void: 'rgb(var(--bg-void) / <alpha-value>)',
+        surface: 'rgb(var(--bg-surface) / <alpha-value>)',
+        'surface-2': 'rgb(var(--bg-surface-2) / <alpha-value>)',
         violet: {
-          primary: '#8B5CF6',
-          deep: '#4C1D95',
-          glow: '#C4B5FD',
+          primary: 'rgb(var(--violet-primary) / <alpha-value>)',
+          deep: 'rgb(var(--violet-deep) / <alpha-value>)',
+          glow: 'rgb(var(--violet-glow) / <alpha-value>)',
         },
         ink: {
-          DEFAULT: '#F1EDF7',
-          muted: '#948AA3',
-          faint: '#4A4058',
+          DEFAULT: 'rgb(var(--text-primary) / <alpha-value>)',
+          muted: 'rgb(var(--text-muted) / <alpha-value>)',
+          faint: 'rgb(var(--text-faint) / <alpha-value>)',
         },
         danger: '#EF4444',
         success: '#22C55E',
@@ -38,15 +38,15 @@ export default {
       },
       boxShadow: {
         modal:
-          '0 0 0 1px rgba(139,92,246,0.18), 0 36px 90px -28px rgba(0,0,0,0.85), 0 0 50px rgba(139,92,246,0.10)',
+          '0 0 0 1px rgb(var(--violet-primary) / 0.18), 0 36px 90px -28px rgba(0,0,0,0.85), 0 0 50px rgb(var(--violet-primary) / 0.10)',
         panel:
-          '0 30px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(139,92,246,0.10)',
+          '0 30px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgb(var(--violet-primary) / 0.10)',
         card: '0 18px 50px -22px rgba(0,0,0,0.8)',
         'card-hover':
-          '0 0 0 1px rgba(139,92,246,0.40), 0 30px 64px -26px rgba(0,0,0,0.88), 0 0 38px rgba(139,92,246,0.14)',
+          '0 0 0 1px rgb(var(--violet-primary) / 0.40), 0 30px 64px -26px rgba(0,0,0,0.88), 0 0 38px rgb(var(--violet-primary) / 0.14)',
         sheet: '0 -24px 64px -24px rgba(0,0,0,0.8)',
         float: '0 14px 34px -14px rgba(0,0,0,0.7)',
-        glow: '0 10px 30px -8px rgba(139,92,246,0.5)',
+        glow: '0 10px 30px -8px rgb(var(--violet-primary) / 0.5)',
       },
       keyframes: {
         drift: {

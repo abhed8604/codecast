@@ -4,9 +4,9 @@ import { useTutorialStore } from '../store/useTutorialStore.js'
 import { CheckIcon, AlertIcon, XIcon } from './Icons.jsx'
 
 const accent = {
-  success: { color: 'var(--success)', Icon: CheckIcon },
-  error: { color: 'var(--danger)', Icon: AlertIcon },
-  info: { color: 'var(--violet-glow)', Icon: CheckIcon },
+  success: { color: 'var(--success)', bg: 'rgba(34,197,94,0.12)', Icon: CheckIcon },
+  error: { color: 'var(--danger)', bg: 'rgba(239,68,68,0.12)', Icon: AlertIcon },
+  info: { color: 'rgb(var(--violet-glow))', bg: 'rgb(var(--violet-glow) / 0.12)', Icon: CheckIcon },
 }
 
 /**
@@ -21,7 +21,7 @@ export default function ToastHost() {
     <div className="pointer-events-none fixed bottom-4 right-4 z-[60] flex w-[min(360px,calc(100vw-2rem))] flex-col gap-2">
       <AnimatePresence>
         {toasts.map((t) => {
-          const { color, Icon } = accent[t.variant] || accent.info
+          const { color, bg, Icon } = accent[t.variant] || accent.info
           return (
             <motion.div
               key={t.id}
@@ -34,7 +34,7 @@ export default function ToastHost() {
             >
               <span
                 className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full text-sm"
-                style={{ color, background: `${color}1f` }}
+                style={{ color, background: bg }}
               >
                 <Icon />
               </span>
